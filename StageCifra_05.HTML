@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>StageCifra 3.8</title>
+<style>
+:root {
+--black: #0B0B0B;
+--graphite: #151515;
+--surface: #1B1B1B;
+--surface2: #282828;
+--orange: #FF7A00;
+--orange2: #FF9A3D;
+--chord-color: #FF9A3D;
+--white: #FFFFFF;
+--gray: #9E9E9E;
+}
+• {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+-webkit-tap-highlight-color: transparent !important;
+-webkit-user-select: none !important;
+user-select: none !important;
+outline: none !important;
+}
+input, textarea, select {
+-webkit-user-select: text !important;
+user-select: text !important;
+font-family: inherit;
+color: #fff;
+background: var(--surface);
+}
+html, body {
+height: 100%;
+width: 100%;
+background: #000;
+color: #fff;
+font-family: sans-serif;
+overflow: hidden;
+}
+button {
+font-family: inherit;
+cursor: pointer;
+border: none;
+color: inherit;
+background: none;
+}
+#app {
+width: 100%;
+height: 100%;
+background: var(--black);
+display: flex;
+flex-direction: column;
+position: relative;
+overflow: hidden;
+}
+.view {
+flex: 1;
+overflow-y: auto;
+padding: 14px 14px 40px;
+display: none;
+flex-direction: column;
+}
+.view.active { display: flex; }
+
+nav#tabbar {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+background: var(--graphite);
+border-top: 1px solid #2b2b2b;
+padding: 6px 2px 18px;
+flex-shrink: 0;
+z-index: 50;
+}
+nav#tabbar button {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+padding: 6px 2px;
+color: var(--gray);
+font-size: 10px;
+font-weight: 700;
+border-radius: 10px;
+}
+nav#tabbar button .ic { font-size: 18px; }
+nav#tabbar button.active { color: var(--orange); background: rgba(255,122,0,0.12); }
+
+.topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.topbar h2 { font-size: 20px; font-weight: 800; flex: 1; }
+.iconbtn {
+width: 40px; height: 40px; border-radius: 10px; background: var(--surface);
+display: flex; align-items: center; justify-content: center; font-size: 16px;
+border: 1px solid #2b2b2b;
+}
+.logo { display: flex; align-items: center; gap: 8px; flex: 1; }
+.logo-mark {
+width: 38px; height: 38px; border-radius: 10px; background: var(--orange);
+display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.logo-text { font-size: 22px; font-weight: 900; }
+.logo-text span { color: var(--orange); }
+
+.banner {
+border-radius: 16px; padding: 16px; margin-bottom: 14px;
+background: linear-gradient(135deg, #221509, #111);
+border: 1px solid #382412;
+}
+.banner h3 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.banner h3 span { color: var(--orange); }
+.banner p { color: #bbb; font-size: 12px; line-height: 1.4; }
+.banner-stats { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.stat-item { background: #000; padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; color: var(--orange2); border: 1px solid #332211; }
+
+.shortcuts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.shortcut {
+background: var(--surface); border-radius: 12px; padding: 12px 4px;
+display: flex; flex-direction: column; align-items: center; gap: 5px;
+font-size: 11px; font-weight: 700; border: 1px solid #262626;
+}
+.shortcut.primary { background: var(--orange); color: #fff; border: none; }
+.shortcut .ic { font-size: 20px; }
+
+.section-title { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 8px; font-size: 14px; font-weight: 800; }
+.song-card {
+display: flex; gap: 10px; align-items: center; background: var(--surface);
+border-radius: 14px; padding: 11px; margin-bottom: 8px; border: 1px solid #252525;
+}
+.song-card .cover {
+width: 44px; height: 44px; background: var(--surface2); border-radius: 10px;
+display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
+}
+.song-info { flex: 1; min-width: 0; }
+.song-info .name { font-weight: 700; font-size: 14px; }
+.song-info .artist { color: var(--gray); font-size: 12px; }
+.badges { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 12px; background: var(--surface2); color: var(--orange2); }
+
+.btn {
+padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px;
+display: flex; align-items: center; justify-content: center; gap: 6px;
+width: 100%; margin-bottom: 8px;
+}
+.btn-primary { background: var(--orange); color: #fff; }
+.btn-dark { background: var(--surface2); border: 1px solid #383838; color: #fff; }
+.btn-danger { background: #3a1515; color: #ff7b7b; border: 1px solid #572020; }
+
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 4px; text-transform: uppercase; }
+.field input, .field textarea, .field select {
+width: 100%; background: var(--surface); border: 1px solid #2e2e2e;
+border-radius: 10px; padding: 10px; font-size: 14px;
+}
+.field textarea { min-height: 180px; font-family: monospace; white-space: pre; }
+.cardx { background: var(--surface); border: 1px solid #2b2b2b; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rowx { display: flex; gap: 8px; align-items: center; }
+
+/* MODO PALCO */
+#view-stage {
+background: #000; padding: 12px; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+z-index: 100; display: none; flex-direction: column; overflow: hidden;
+}
+#view-stage.active { display: flex; }
+#stage-metronome-bar { height: 5px; width: 100%; margin-bottom: 6px; border-radius: 3px; }
+#stage-metronome-bar.on { background: var(--orange); box-shadow: 0 0 12px var(--orange); }
+#stage-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px; margin-bottom: 8px; }
+#stage-setup-banner { background: #141414; border-left: 3px solid var(--orange); padding: 5px 8px; font-size: 12px; margin-bottom: 8px; display: none; }
+#stage-content {
+font-family: monospace; font-size: 18px; line-height: 1.55; white-space: pre-wrap;
+color: #fff; flex: 1; overflow-y: auto; padding-bottom: 110px;
+}
+#stage-content.paged-mode { overflow-y: hidden; padding-bottom: 90px; }
+#stage-content.two-cols { column-count: 2; column-gap: 20px; column-rule: 1px solid #222; }
+.chord { color: var(--chord-color); font-weight: 800; }
+.section-label { color: #aaa; font-weight: 800; background: #181818; padding: 1px 5px; border-radius: 4px; }
+
+#stage-page-indicator {
+display: none; position: absolute; bottom: 74px; left: 50%; transform: translateX(-50%);
+background: #161616; border: 1px solid #383838; border-radius: 20px; padding: 5px 12px;
+font-size: 12px; font-weight: 800; color: var(--orange2); z-index: 105; align-items: center; gap: 10px;
+}
+#stage-page-indicator.show { display: flex; }
+#stage-page-indicator button { background: var(--surface2); padding: 4px 10px; border-radius: 8px; color: #fff; font-weight: 800; }
+
+.stage-controls {
+position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+display: flex; gap: 5px; background: rgba(20,20,20,0.95); padding: 6px 8px;
+border-radius: 20px; border: 1px solid #333; max-width: 96%; overflow-x: auto; z-index: 110;
+}
+.stage-btn {
+height: 36px; min-width: 36px; padding: 0 8px; border-radius: 10px;
+background: var(--surface2); font-size: 12px; font-weight: 700; white-space: nowrap;
+}
+.stage-btn.active { background: var(--orange); color: #fff; }
+
+/* TECLADO MIDI */
+.midi-scroll { width: 100%; overflow-x: auto; padding: 10px 4px; background: #0d0d0d; border: 1px solid #2b2b2b; border-radius: 12px; }
+.midi-keys { position: relative; height: 164px; }
+.midi-key-white {
+position: absolute; top: 0; width: 38px; height: 160px; background: #f2f2f2;
+border: 1px solid #666; border-radius: 0 0 5px 5px; color: #111;
+display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
+font-size: 10px; font-weight: 800; z-index: 1;
+}
+.midi-key-black {
+position: absolute; top: 0; width: 24px; height: 98px; background: #181818;
+border: 1px solid #000; border-radius: 0 0 4px 4px; color: #fff;
+display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;
+font-size: 8px; font-weight: 700; z-index: 3;
+}
+.midi-key-white.sounding, .midi-key-black.sounding { background: var(--orange) !important; color: #fff !important; }
+.midi-key-white.out-range, .midi-key-black.out-range { opacity: 0.3; }
+
+#toast {
+position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+background: var(--orange); color: #fff; font-weight: 700; font-size: 12px;
+padding: 8px 16px; border-radius: 16px; z-index: 300; display: none;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+<div id="toast"></div>
+
+<!-- INICIO -->
+<div id="view-home" class="view active">
+<div class="topbar">
+<div class="logo">
+<div class="logo-mark">🎵</div>
+<div class="logo-text">Stage<span>Cifra</span></div>
+</div>
+<span id="status-badge" style="font-size:11px;padding:4px 8px;border-radius:12px;background:#222;color:#ffbd69;font-weight:700">JS Desativado no APK</span>
+</div>
+
+<div class="banner">
+<h3>Suas cifras <br><span>prontas para o palco</span></h3>
+<p>Modo palco em páginas (corte) ou rolagem para pedal M-Vave, metrônomo visual e teclado MIDI.</p>
+<div class="banner-stats">
+<span class="stat-item" id="stat-songs">0 Músicas</span>
+<span class="stat-item" id="stat-setlists">0 Setlists</span>
+<span class="stat-item" id="stat-mode">Modo: Página</span>
+</div>
+</div>
+
+<div class="shortcuts">
+<button type="button" class="shortcut primary" onclick="appOpenForm()">
+<span class="ic">➕</span>Nova
+</button>
+<button type="button" class="shortcut" onclick="appNav('view-library')">
+<span class="ic">🎵</span>Cifras
+</button>
+<button type="button" class="shortcut" onclick="appNav('view-setlists')">
+<span class="ic">📁</span>Setlists
+</button>
+<button type="button" class="shortcut" onclick="appNav('view-profile')">
+<span class="ic">⚙️</span>Ajustes
+</button>
+</div>
+
+<div class="section-title">
+<span>Músicas Cadastradas</span>
+<span style="color:var(--orange);font-size:12px;cursor:pointer" onclick="appNav('view-library')">Ver todas</span>
+</div>
+<div id="home-recent-list"></div>
+
+<div class="section-title"><span>⭐ Favoritas</span></div>
+<div id="home-favs-list"></div>
+</div>
+
+<!-- BIBLIOTECA -->
+<div id="view-library" class="view">
+<div class="topbar">
+<h2>Biblioteca de Cifras</h2>
+<button type="button" class="iconbtn" onclick="appOpenForm()">➕</button>
+</div>
+<div class="field">
+<input type="text" id="search-input" placeholder="Buscar música, artista ou timbre..." oninput="appRenderLibrary()">
+</div>
+<div id="library-list"></div>
+</div>
+
+<!-- FORMULARIO -->
+<div id="view-form" class="view">
+<div class="topbar">
+<button type="button" class="iconbtn" onclick="appNav('view-library')">🔙</button>
+<h2 id="form-header-title">Cadastrar Cifra</h2>
+</div>
+<input type="hidden" id="form-id">
+<div class="field"><label>Nome da Música *</label><input type="text" id="form-title" placeholder="Ex: Oceanos"></div>
+<div class="field"><label>Artista / Banda *</label><input type="text" id="form-artist" placeholder="Ex: Ana Nóbrega"></div>
+<div class="grid2">
+<div class="field">
+<label>Tom</label>
+<select id="form-key">
+<option value="C">C</option><option value="C#">C#</option><option value="D">D</option>
+<option value="D#">D#</option><option value="E">E</option><option value="F">F</option>
+<option value="F#">F#</option><option value="G">G</option><option value="G#">G#</option>
+<option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
+<option value="Am">Am</option><option value="Bm">Bm</option><option value="Em">Em</option>
+</select>
+</div>
+<div class="field"><label>BPM</label><input type="number" id="form-bpm" placeholder="Ex: 72"></div>
+</div>
+<div class="field"><label>Timbre / Patch (Ex: XPS-10X Piano + Pad)</label><input type="text" id="form-patch"></div>
+<div class="field"><label>Cifra Completa *</label><textarea id="form-lyrics" placeholder="Cole a cifra aqui..."></textarea></div>
+<button type="button" class="btn btn-primary" onclick="appSaveSong()">💾 Salvar Cifra</button>
+<button type="button" class="btn btn-dark" onclick="appNav('view-library')">Cancelar</button>
+</div>
+
+<!-- DETALHE DA MUSICA -->
+<div id="view-detail" class="view">
+<div class="topbar">
+<button type="button" class="iconbtn" onclick="appNav('view-library')">🔙</button>
+<h2 id="detail-title">Música</h2>
+<button type="button" class="iconbtn" onclick="appToggleFavCurrent()">⭐</button>
+</div>
+<p id="detail-artist" style="color:var(--gray);font-size:13px;margin-bottom:8px"></p>
+<div class="badges" style="margin-bottom:12px">
+<span class="badge" id="detail-key-badge">Tom: -</span>
+<span class="badge" id="detail-bpm-badge"></span>
+<span class="badge" id="detail-patch-badge"></span>
+</div>
+
+<div class="cardx rowx" style="justify-content:space-between">
+<span style="font-size:12px;font-weight:800">TRANSPOR:</span>
+<div class="rowx">
+<button type="button" class="iconbtn" onclick="appTransposeDetail(-1)">-½</button>
+<strong id="detail-trans-val" style="min-width:36px;text-align:center">Orig</strong>
+<button type="button" class="iconbtn" onclick="appTransposeDetail(1)">+½</button>
+<button type="button" class="iconbtn" onclick="appToggleAccidental()" id="btn-acc">#/b</button>
+</div>
+</div>
+
+<button type="button" class="btn btn-primary" onclick="appStartStage(false)">🎤 Entrar no Modo Palco</button>
+<div class="grid2">
+<button type="button" class="btn btn-dark" onclick="appEditCurrent()">✏️ Editar</button>
+<button type="button" class="btn btn-danger" onclick="appDeleteCurrent()">🗑️ Excluir</button>
+</div>
+<div id="detail-cifra" class="cardx" style="font-family:monospace;white-space:pre-wrap;line-height:1.55;margin-top:8px"></div>
+</div>
+
+<!-- SETLISTS -->
+<div id="view-setlists" class="view">
+<div class="topbar">
+<h2>Meus Setlists</h2>
+<button type="button" class="iconbtn" onclick="appCreateSetlistPrompt()">➕</button>
+</div>
+<div id="setlists-list"></div>
+</div>
+
+<!-- DETALHE SETLIST -->
+<div id="view-setlist-detail" class="view">
+<div class="topbar">
+<button type="button" class="iconbtn" onclick="appNav('view-setlists')">🔙</button>
+<h2 id="setlist-detail-title">Setlist</h2>
+</div>
+<button type="button" class="btn btn-primary" onclick="appStartStage(true)">🎤 Tocar Setlist no Palco</button>
+<button type="button" class="btn btn-dark" onclick="appAddSongToSetlistPrompt()">➕ Adicionar Música da Biblioteca</button>
+<div id="setlist-songs-list" style="margin-top:10px"></div>
+</div>
+
+<!-- PLAYER -->
+<div id="view-player" class="view">
+<div class="topbar"><h2>🎧 Player de Estudo</h2></div>
+<div class="cardx">
+<div id="player-title" style="font-weight:800;margin-bottom:6px">Selecione um arquivo de áudio</div>
+<input type="file" accept="audio/*" onchange="appLoadAudioFile(event)" style="margin-bottom:10px">
+<audio id="audio-element" controls style="width:100%"></audio>
+<div class="grid2" style="margin-top:10px">
+<button type="button" class="btn btn-dark" onclick="appSkipAudio(-5)">⏪ -5s</button>
+<button type="button" class="btn btn-dark" onclick="appSkipAudio(5)">⏩ +5s</button>
+</div>
+</div>
+</div>
+
+<!-- MIDI -->
+<div id="view-midi" class="view">
+<div class="topbar">
+<h2>🎹 Teclado MIDI</h2>
+<button type="button" class="iconbtn" style="width:auto;padding:0 10px;font-size:12px" onclick="appSet61Keys()">61 Teclas</button>
+</div>
+<div class="cardx">
+<div style="font-size:11px;color:var(--gray);font-weight:800">ACORDE DETECTADO</div>
+<div id="midi-chord" style="font-size:28px;font-weight:900;color:var(--orange);margin:4px 0">—</div>
+<div id="midi-notes" style="font-size:12px;color:#ccc">Toque nas teclas brancas e pretas abaixo</div>
+</div>
+<div class="midi-scroll" id="midi-scroll-box">
+<div id="midi-keys" class="midi-keys"></div>
+</div>
+<div class="grid2" style="margin-top:10px">
+<button type="button" class="btn btn-primary" onclick="appConnectUsbMidi()">🔌 Conectar USB MIDI</button>
+<button type="button" class="btn btn-dark" onclick="appCenterMidiC4()">Centralizar Dó (C4)</button>
+</div>
+</div>
+
+<!-- GRAVAR -->
+<div id="view-recordings" class="view">
+<div class="topbar"><h2>⏺ Gravações e Eventos</h2></div>
+<div class="cardx">
+<strong>Gravar Áudio de Ensaio</strong>
+<div class="grid2" style="margin-top:10px">
+<button type="button" class="btn btn-primary" onclick="appStartRec()">🎙️ Iniciar</button>
+<button type="button" class="btn btn-danger" onclick="appStopRec()">■ Parar</button>
+</div>
+<div id="rec-status" style="font-size:12px;color:var(--gray);margin-top:6px">Pronto para gravar.</div>
+<div id="rec-links" style="margin-top:8px"></div>
+</div>
+</div>
+
+<!-- AJUSTES -->
+<div id="view-profile" class="view">
+<div class="topbar"><h2>⚙️ Ajustes, Palco e Pedal</h2></div>
+<div class="cardx">
+<div class="field">
+<label>Modo do Palco e Pedal M-Vave</label>
+<select id="setting-pedal-mode" onchange="appSaveSettings()">
+<option value="page">📄 Modo Página (Corta a cifra e pula página no pedal)</option>
+<option value="scroll">📜 Modo Rolagem Contínua</option>
+</select>
+</div>
+<div class="grid2">
+<div class="field">
+<label>Tema Visual</label>
+<select id="setting-theme" onchange="appSaveSettings()">
+<option value="orange">Laranja Stage</option>
+<option value="red">Vermelho Stage Red</option>
+<option value="oled">OLED Preto Puro</option>
+</select>
+</div>
+<div class="field">
+<label>Cor dos Acordes</label>
+<select id="setting-chord-color" onchange="appSaveSettings()">
+<option value="#FF9A3D">Laranja</option>
+<option value="#FFD700">Amarelo Ouro</option>
+<option value="#00E5FF">Ciano</option>
+<option value="#69F0AE">Verde</option>
+</select>
+</div>
+</div>
+<div class="field">
+<label>Diagnóstico do Pedal M-Vave</label>
+<div id="pedal-diag" style="background:#000;padding:8px;border-radius:8px;font-family:monospace;font-size:12px;color:var(--orange2)">Pise no pedal para ver a tecla...</div>
+</div>
+</div>
+
+<div class="cardx">
+<button type="button" class="btn btn-primary" onclick="appExportBackup()">📥 Exportar Backup JSON</button>
+<button type="button" class="btn btn-dark" onclick="appResetDemo()">🎵 Restaurar Músicas de Exemplo</button>
+</div>
+</div>
+
+<!-- MODO PALCO TELA CHEIA -->
+<div id="view-stage">
+<div id="stage-metronome-bar"></div>
+<div id="stage-header">
+<div>
+<div id="stage-title" style="font-size:18px;font-weight:900">Música</div>
+<div id="stage-artist" style="font-size:12px;color:var(--gray)">Artista</div>
+</div>
+<div class="rowx">
+<button type="button" class="iconbtn" id="btn-stage-lock" onclick="appToggleStageLock()">🔓</button>
+<button type="button" class="iconbtn" id="btn-stage-exit" onclick="appExitStage()">✖</button>
+</div>
+</div>
+<div id="stage-setup-banner"></div>
+<div id="stage-content" onclick="appStageTap(event)"></div>
+
+<div id="stage-page-indicator">
+<button type="button" onclick="appStepPage(-1)">◀ Ant</button>
+<span id="stage-page-text">Pág 1 / 1</span>
+<button type="button" onclick="appStepPage(1)">Próx ▶</button>
+</div>
+
+<div class="stage-controls" id="stage-controls-bar">
+<button type="button" class="stage-btn" onclick="appTransposeStage(-1)">-½</button>
+<span id="stage-trans-val" style="font-size:12px;font-weight:800;padding:0 4px;display:flex;align-items:center">Orig</span>
+<button type="button" class="stage-btn" onclick="appTransposeStage(1)">+½</button>
+<button type="button" class="stage-btn" onclick="appStageFont(-2)">A-</button>
+<button type="button" class="stage-btn" onclick="appStageFont(2)">A+</button>
+<button type="button" class="stage-btn" id="btn-stage-mode" onclick="appToggleStageMode()">📄 Pág</button>
+<button type="button" class="stage-btn" id="btn-stage-cols" onclick="appToggleCols()">☷ 2Col</button>
+<button type="button" class="stage-btn" id="btn-stage-metro" onclick="appToggleMetro()">⏱ BPM</button>
+<button type="button" class="stage-btn" id="btn-autoscroll" onclick="appToggleScroll()">⏬ Scroll</button>
+</div>
+</div>
+
+<!-- BARRA INFERIOR -->
+<nav id="tabbar">
+<button type="button" id="tab-home" class="active" onclick="appNav('view-home')"><span class="ic">🏠</span>Início</button>
+<button type="button" id="tab-library" onclick="appNav('view-library')"><span class="ic">🎵</span>Cifras</button>
+<button type="button" id="tab-setlists" onclick="appNav('view-setlists')"><span class="ic">📁</span>Setlists</button>
+<button type="button" id="tab-player" onclick="appNav('view-player')"><span class="ic">🎧</span>Player</button>
+<button type="button" id="tab-midi" onclick="appNav('view-midi')"><span class="ic">🎹</span>MIDI</button>
+<button type="button" id="tab-recordings" onclick="appNav('view-recordings')"><span class="ic">⏺</span>Gravar</button>
+<button type="button" id="tab-profile" onclick="appNav('view-profile')"><span class="ic">⚙️</span>Ajustes</button>
+</nav>
+</div>
+
+<script>
+var DEMO_SONGS = [
+{
+id: 's1', title: 'Oceanos', artist: 'Ana Nobrega', key: 'D', bpm: 66, patch: 'XPS-10X Piano + Warm Pad', favorite: true,
+lyrics: '[Intro]\n[Bm] [A/C#] [D] [A] [G]\n\n[Primeira Parte]\n[Bm] Tua voz me chama sobre as aguas\n[A/C#] Onde os meus pes podem falhar\n[D] E ali te encontro no misterio\n[G] Em oceanos fundos guiaras minha fe\n\n[Refrao]\n[G] E ao Teu nome clamarei\n[D] E olharei alem das ondas\n[A] O mar sossegara\n[G] Minha alma descansara em Ti\n[A] Sou Teu e Tu es meu'
+},
+{
+id: 's2', title: 'Lugar Secreto', artist: 'Gabriela Rocha', key: 'G', bpm: 72, patch: 'XPS-10X Synth Pad + Piano', favorite: true,
+lyrics: '[Intro]\n[G] [D/F#] [Em7] [C9]\n\n[Primeira Parte]\n[G] Tu es tudo o que eu mais quero\n[D/F#] O meu folego, Tu es\n[Em7] Em Teus bracos e o meu lugar\n[C9] Estou aqui, estou aqui\n\n[Refrao]\n[G] Guia-me pra que eu veja mais de Ti\n[D/F#] Saber de Ti, conhecer-te mais\n[Em7] Quero ir mais fundo do que ja fui\n[C9] Leva-me ao lugar secreto'
+}
+];
+
+var state = {
+songs: DEMO_SONGS.slice(),
+setlists: [{ id: 'sl1', name: 'Repertorio Principal', songIds: ['s1', 's2'] }],
+settings: { fontSize: 18, pedalMode: 'page', theme: 'orange', chordColor: '#FF9A3D', accidental: 'sharp', twoColumns: false },
+currentSongId: 's1',
+currentSetlistId: null,
+currentSetlistIndex: 0,
+transposition: 0,
+stagePages: [],
+currentPageIndex: 0,
+stageLocked: false,
+scrollTimer: null,
+metroTimer: null,
+midiMin: 36,
+midiMax: 96
+};
+
+try {
+var savedSongs = localStorage.getItem('sc_songs_v38');
+if (savedSongs) state.songs = JSON.parse(savedSongs);
+var savedLists = localStorage.getItem('sc_lists_v38');
+if (savedLists) state.setlists = JSON.parse(savedLists);
+var savedSet = localStorage.getItem('sc_set_v38');
+if (savedSet) state.settings = Object.assign(state.settings, JSON.parse(savedSet));
+} catch (e) {}
+
+function saveAll() {
+try {
+localStorage.setItem('sc_songs_v38', JSON.stringify(state.songs));
+localStorage.setItem('sc_lists_v38', JSON.stringify(state.setlists));
+localStorage.setItem('sc_set_v38', JSON.stringify(state.settings));
+} catch (e) {}
+updateCounters();
+}
+
+function showToast(msg) {
+var t = document.getElementById('toast');
+if (!t) return;
+t.textContent = msg;
+t.style.display = 'block';
+clearTimeout(window._tTimer);
+window._tTimer = setTimeout(function() { t.style.display = 'none'; }, 2000);
+}
+
+var NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+var NOTES_FLAT = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+var NOTE_MAP = {C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
+
+function trNote(n, steps) {
+var idx = NOTE_MAP[n];
+if (idx === undefined) return n;
+var t = ((idx + steps) % 12 + 12) % 12;
+return state.settings.accidental === 'flat' ? NOTES_FLAT[t] : NOTES_SHARP[t];
+}
+
+function trChord(token, steps) {
+if (!token) return token;
+return token.split('/').map(function(part) {
+var m = /^(A-G?)(.*)$`/.exec(part);
+if (!m) return part;
+return trNote(m[1], steps) + m[2];
+}).join('/');
+}
+
+function formatCifraLine(line, steps) {
+if (line.indexOf('[') !== -1 && line.indexOf(']') !== -1) {
+return line.replace(/[([^]]+)]/g, function(full, inside) {
+var c = inside.trim();
+if (/^A-G?[mM0-9a-zA-Z#b+-/()]*`$/.test(c) && c.length <= 11) {
+return '<span class="chord">[' + trChord(c, steps) + ']</span>';
+}
+return '<span class="section-label">[' + c + ']</span>';
+});
+}
+return line || ' ';
+}
+
+function formatCifraFull(text, steps) {
+return String(text || '').split(/\r?\n/).map(function(l) { return formatCifraLine(l, steps); }).join('\n');
+}
+
+function appNav(viewId) {
+document.getElementById('view-stage').classList.remove('active');
+var views = document.querySelectorAll('.view');
+for (var i = 0; i < views.length; i++) views[i].classList.remove('active');
+var target = document.getElementById(viewId);
+if (target && viewId !== 'view-stage') target.classList.add('active');
+if (viewId === 'view-stage') document.getElementById('view-stage').classList.add('active');
+
+var tabs = document.querySelectorAll('#tabbar button');
+for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+var tab = document.getElementById(viewId.replace('view-', 'tab-'));
+if (tab) tab.classList.add('active');
+document.getElementById('tabbar').style.display = viewId === 'view-stage' ? 'none' : 'grid';
+
+if (viewId === 'view-home') appRenderHome();
+if (viewId === 'view-library') appRenderLibrary();
+if (viewId === 'view-setlists') appRenderSetlists();
+if (viewId === 'view-midi') appInitMidi();
+}
+
+function makeSongCard(s) {
+return '<div class="song-card" onclick="appOpenDetail('' + s.id + '')">' +
+'<div class="cover">' + (s.key || '🎵') + '</div>' +
+'<div class="song-info">' +
+'<div class="name">' + s.title + '</div>' +
+'<div class="artist">' + s.artist + '</div>' +
+'<div class="badges">' +
+(s.key ? '<span class="badge">Tom: ' + s.key + '</span>' : '') +
+(s.bpm ? '<span class="badge">' + s.bpm + ' BPM</span>' : '') +
+(s.patch ? '<span class="badge">🎹 ' + s.patch + '</span>' : '') +
+'</div>' +
+'</div>' +
+'</div>';
+}
+
+function updateCounters() {
+document.getElementById('stat-songs').textContent = state.songs.length + ' Músicas';
+document.getElementById('stat-setlists').textContent = state.setlists.length + ' Setlists';
+document.getElementById('stat-mode').textContent = state.settings.pedalMode === 'page' ? 'Modo: Página (Corte)' : 'Modo: Rolagem';
+document.getElementById('setting-pedal-mode').value = state.settings.pedalMode;
+document.getElementById('setting-theme').value = state.settings.theme;
+document.getElementById('setting-chord-color').value = state.settings.chordColor;
+
+var root = document.documentElement;
+root.style.setProperty('--orange', state.settings.theme === 'red' ? '#E53935' : '#FF7A00');
+root.style.setProperty('--black', state.settings.theme === 'oled' ? '#000000' : '#0B0B0B');
+root.style.setProperty('--chord-color', state.settings.chordColor);
+}
+
+function appRenderHome() {
+updateCounters();
+document.getElementById('home-recent-list').innerHTML = state.songs.map(makeSongCard).join('');
+var favs = state.songs.filter(function(s) { return s.favorite; });
+document.getElementById('home-favs-list').innerHTML = favs.map(makeSongCard).join('');
+}
+
+function appRenderLibrary() {
+var q = (document.getElementById('search-input').value || '').toLowerCase();
+var list = state.songs.filter(function(s) {
+return s.title.toLowerCase().indexOf(q) !== -1 || s.artist.toLowerCase().indexOf(q) !== -1;
+});
+document.getElementById('library-list').innerHTML = list.map(makeSongCard).join('');
+}
+
+function appOpenForm(song) {
+document.getElementById('form-id').value = song ? song.id : '';
+document.getElementById('form-title').value = song ? song.title : '';
+document.getElementById('form-artist').value = song ? song.artist : '';
+document.getElementById('form-key').value = song ? song.key : 'C';
+document.getElementById('form-bpm').value = song ? (song.bpm || '') : '';
+document.getElementById('form-patch').value = song ? (song.patch || '') : '';
+document.getElementById('form-lyrics').value = song ? song.lyrics : '';
+appNav('view-form');
+}
+
+function appSaveSong() {
+var id = document.getElementById('form-id').value || ('s' + Date.now());
+var title = document.getElementById('form-title').value.trim();
+var artist = document.getElementById('form-artist').value.trim();
+var lyrics = document.getElementById('form-lyrics').value;
+if (!title || !lyrics) { showToast('Preencha nome e cifra!'); return; }
+var obj = {
+id: id, title: title, artist: artist || 'Artista',
+key: document.getElementById('form-key').value,
+bpm: Number(document.getElementById('form-bpm').value) || 0,
+patch: document.getElementById('form-patch').value.trim(),
+lyrics: lyrics, favorite: true
+};
+var idx = state.songs.findIndex(function(x) { return x.id === id; });
+if (idx >= 0) state.songs[idx] = obj; else state.songs.unshift(obj);
+saveAll();
+appOpenDetail(id);
+}
+
+function appOpenDetail(id) {
+var s = state.songs.find(function(x) { return x.id === id; });
+if (!s) return;
+state.currentSongId = s.id;
+state.transposition = 0;
+document.getElementById('detail-title').textContent = s.title;
+document.getElementById('detail-artist').textContent = s.artist;
+document.getElementById('detail-bpm-badge').textContent = s.bpm ? (s.bpm + ' BPM') : '';
+document.getElementById('detail-patch-badge').textContent = s.patch ? ('🎹 ' + s.patch) : '';
+appRenderDetailCifra();
+appNav('view-detail');
+}
+
+function appRenderDetailCifra() {
+var s = state.songs.find(function(x) { return x.id === state.currentSongId; });
+if (!s) return;
+document.getElementById('detail-key-badge').textContent = 'Tom: ' + trChord(s.key, state.transposition);
+document.getElementById('detail-trans-val').textContent = state.transposition === 0 ? 'Orig' : (state.transposition > 0 ? '+' + state.transposition : state.transposition);
+document.getElementById('detail-cifra').innerHTML = formatCifraFull(s.lyrics, state.transposition);
+}
+
+function appTransposeDetail(step) { state.transposition += step; appRenderDetailCifra(); }
+function appToggleAccidental() {
+state.settings.accidental = state.settings.accidental === 'sharp' ? 'flat' : 'sharp';
+saveAll(); appRenderDetailCifra();
+showToast(state.settings.accidental === 'flat' ? 'Bemóis (b)' : 'Sustenidos (#)');
+}
+function appToggleFavCurrent() {
+var s = state.songs.find(function(x) { return x.id === state.currentSongId; });
+if (s) { s.favorite = !s.favorite; saveAll(); showToast(s.favorite ? 'Adicionada às Favoritas' : 'Removida das Favoritas'); }
+}
+function appEditCurrent() {
+var s = state.songs.find(function(x) { return x.id === state.currentSongId; });
+if (s) appOpenForm(s);
+}
+function appDeleteCurrent() {
+state.songs = state.songs.filter(function(x) { return x.id !== state.currentSongId; });
+saveAll(); appNav('view-library');
+}
+
+/* SETLISTS */
+function appRenderSetlists() {
+document.getElementById('setlists-list').innerHTML = state.setlists.map(function(sl) {
+return '<div class="song-card" onclick="appOpenSetlist('' + sl.id + '')">' +
+'<div class="cover">📁</div>' +
+'<div class="song-info"><div class="name">' + sl.name + '</div><div class="artist">' + sl.songIds.length + ' músicas</div></div>' +
+'</div>';
+}).join('');
+}
+function appCreateSetlistPrompt() {
+var name = prompt('Nome do novo Setlist:');
+if (!name) return;
+state.setlists.push({ id: 'sl' + Date.now(), name: name, songIds: state.songs.map(function(s) { return s.id; }) });
+saveAll(); appRenderSetlists();
+}
+function appOpenSetlist(id) {
+var sl = state.setlists.find(function(x) { return x.id === id; });
+if (!sl) return;
+state.currentSetlistId = sl.id;
+document.getElementById('setlist-detail-title').textContent = sl.name;
+var songs = sl.songIds.map(function(sid) { return state.songs.find(function(s) { return s.id === sid; }); }).filter(Boolean);
+document.getElementById('setlist-songs-list').innerHTML = songs.map(makeSongCard).join('');
+appNav('view-setlist-detail');
+}
+function appAddSongToSetlistPrompt() {
+var sl = state.setlists.find(function(x) { return x.id === state.currentSetlistId; });
+if (!sl) return;
+sl.songIds = state.songs.map(function(s) { return s.id; });
+saveAll(); appOpenSetlist(sl.id); showToast('Todas as músicas adicionadas ao setlist!');
+}
+
+/* MODO PALCO PAGINADO + ROLAGEM */
+function appStartStage(fromSetlist) {
+if (fromSetlist) {
+var sl = state.setlists.find(function(x) { return x.id === state.currentSetlistId; });
+if (sl && sl.songIds.length) { state.currentSetlistIndex = 0; state.currentSongId = sl.songIds[0]; }
+} else {
+state.currentSetlistId = null;
+}
+state.currentPageIndex = 0;
+state.stageLocked = false;
+appNav('view-stage');
+appUpdateStage();
+}
+
+function appUpdateStage() {
+var s = state.songs.find(function(x) { return x.id === state.currentSongId; });
+if (!s) return;
+document.getElementById('stage-title').textContent = s.title;
+document.getElementById('stage-artist').textContent = s.artist + ' • Tom: ' + trChord(s.key, state.transposition);
+document.getElementById('stage-trans-val').textContent = state.transposition === 0 ? 'Orig' : state.transposition;
+
+var banner = document.getElementById('stage-setup-banner');
+if (s.patch || s.bpm) {
+banner.style.display = 'block';
+banner.textContent = (s.patch ? '🎹 ' + s.patch + ' ' : '') + (s.bpm ? '⏱ ' + s.bpm + ' BPM' : '');
+} else banner.style.display = 'none';
+
+var content = document.getElementById('stage-content');
+content.style.fontSize = state.settings.fontSize + 'px';
+content.classList.toggle('two-cols', state.settings.twoColumns);
+
+var isPage = state.settings.pedalMode === 'page';
+content.classList.toggle('paged-mode', isPage);
+document.getElementById('btn-stage-mode').textContent = isPage ? '📄 Pág' : '📜 Scroll';
+document.getElementById('btn-stage-mode').classList.toggle('active', isPage);
+document.getElementById('btn-autoscroll').style.display = isPage ? 'none' : 'inline-flex';
+
+var ind = document.getElementById('stage-page-indicator');
+if (isPage) {
+var lines = String(s.lyrics).split(/\r?\n/);
+var maxL = Math.max(5, Math.floor((content.clientHeight - 95) / (state.settings.fontSize * 1.6)) * (state.settings.twoColumns ? 2 : 1));
+state.stagePages = [];
+for (var i = 0; i < lines.length; i += maxL) {
+state.stagePages.push(lines.slice(i, i + maxL).map(function(l) { return formatCifraLine(l, state.transposition); }).join('\n'));
+}
+if (!state.stagePages.length) state.stagePages = [''];
+if (state.currentPageIndex >= state.stagePages.length) state.currentPageIndex = state.stagePages.length - 1;
+content.innerHTML = state.stagePages[state.currentPageIndex];
+ind.classList.add('show');
+document.getElementById('stage-page-text').textContent = 'Pág ' + (state.currentPageIndex + 1) + ' / ' + state.stagePages.length;
+} else {
+ind.classList.remove('show');
+content.innerHTML = formatCifraFull(s.lyrics, state.transposition);
+}
+}
+
+function appStepPage(dir) {
+if (state.settings.pedalMode !== 'page') {
+document.getElementById('stage-content').scrollTop += dir * 180;
+return;
+}
+var next = state.currentPageIndex + dir;
+if (next >= 0 && next < state.stagePages.length) {
+state.currentPageIndex = next;
+appUpdateStage();
+} else if (dir > 0) {
+showToast('Fim da música!');
+}
+}
+
+function appStageTap(e) {
+if (state.settings.pedalMode !== 'page') return;
+var w = e.currentTarget.clientWidth;
+if (e.clientX > w * 0.35) appStepPage(1); else appStepPage(-1);
+}
+function appTransposeStage(step) { state.transposition += step; appUpdateStage(); }
+function appStageFont(step) { state.settings.fontSize = Math.max(12, Math.min(34, state.settings.fontSize + step)); saveAll(); appUpdateStage(); }
+function appToggleStageMode() {
+state.settings.pedalMode = state.settings.pedalMode === 'page' ? 'scroll' : 'page';
+state.currentPageIndex = 0; saveAll(); appUpdateStage();
+}
+function appToggleCols() { state.settings.twoColumns = !state.settings.twoColumns; appUpdateStage(); }
+function appToggleStageLock() {
+state.stageLocked = !state.stageLocked;
+document.getElementById('btn-stage-lock').textContent = state.stageLocked ? '🔒' : '🔓';
+document.getElementById('stage-controls-bar').style.pointerEvents = state.stageLocked ? 'none' : 'auto';
+document.getElementById('stage-controls-bar').style.opacity = state.stageLocked ? '0.25' : '1';
+showToast(state.stageLocked ? 'Tela travada (Pedal ativo)' : 'Tela destravada');
+}
+function appExitStage() {
+if (state.stageLocked) { showToast('Destrave o cadeado 🔒 primeiro!'); return; }
+clearInterval(state.scrollTimer); state.scrollTimer = null;
+clearInterval(state.metroTimer); state.metroTimer = null;
+appNav('view-detail');
+}
+function appToggleMetro() {
+if (state.metroTimer) {
+clearInterval(state.metroTimer); state.metroTimer = null;
+document.getElementById('stage-metronome-bar').className = '';
+return;
+}
+var s = state.songs.find(function(x) { return x.id === state.currentSongId; });
+var bpm = (s && s.bpm) ? s.bpm : 80;
+var ms = Math.round(60000 / bpm);
+var bar = document.getElementById('stage-metronome-bar');
+state.metroTimer = setInterval(function() {
+bar.className = 'on';
+setTimeout(function() { bar.className = ''; }, 110);
+}, ms);
+showToast('Metrônomo: ' + bpm + ' BPM');
+}
+function appToggleScroll() {
+if (state.scrollTimer) { clearInterval(state.scrollTimer); state.scrollTimer = null; return; }
+state.scrollTimer = setInterval(function() {
+document.getElementById('stage-content').scrollTop += 1;
+}, 35);
+}
+
+/* TECLADO MIDI COM SOM REAL */
+var audioCtx = null;
+var activeMidi = {};
+
+function playNoteSound(note) {
+try {
+if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+if (audioCtx.state === 'suspended') audioCtx.resume();
+var osc = audioCtx.createOscillator();
+var g = audioCtx.createGain();
+osc.type = 'triangle';
+osc.frequency.value = 440 * Math.pow(2, (note - 69) / 12);
+g.gain.value = 0.15;
+osc.connect(g); g.connect(audioCtx.destination);
+osc.start();
+g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+setTimeout(function() { try { osc.stop(); } catch (e) {} }, 620);
+} catch (e) {}
+}
+
+function appInitMidi() {
+var host = document.getElementById('midi-keys');
+if (!host) return;
+host.innerHTML = '';
+var blacks = [1, 3, 6, 8, 10];
+var wIdx = 0;
+var wLeft = {};
+
+for (var n = 21; n <= 108; n++) {
+if (blacks.indexOf(n % 12) !== -1) continue;
+var left = wIdx * 38;
+wLeft[n] = left;
+var k = document.createElement('div');
+k.className = 'midi-key-white' + (n < state.midiMin || n > state.midiMax ? ' out-range' : '');
+k.style.left = left + 'px';
+k.textContent = NOTES_SHARP[n % 12] + (Math.floor(n / 12) - 1);
+bindKey(k, n);
+host.appendChild(k);
+wIdx++;
+}
+for (var b = 21; b <= 108; b++) {
+if (blacks.indexOf(b % 12) === -1) continue;
+var pLeft = wLeft[b - 1];
+if (pLeft === undefined) continue;
+var bk = document.createElement('div');
+bk.className = 'midi-key-black' + (b < state.midiMin || b > state.midiMax ? ' out-range' : '');
+bk.style.left = (pLeft + 26) + 'px';
+bindKey(bk, b);
+host.appendChild(bk);
+}
+host.style.width = (wIdx * 38) + 'px';
+}
+
+function bindKey(el, note) {
+el.onclick = function() {
+el.classList.add('sounding');
+playNoteSound(note);
+var name = NOTES_SHARP[note % 12] + (Math.floor(note / 12) - 1);
+document.getElementById('midi-chord').textContent = NOTES_SHARP[note % 12];
+document.getElementById('midi-notes').textContent = 'Nota tocada: ' + name;
+setTimeout(function() { el.classList.remove('sounding'); }, 300);
+};
+}
+
+function appSet61Keys() { state.midiMin = 36; state.midiMax = 96; appInitMidi(); appCenterMidiC4(); showToast('Faixa 61 teclas (C2 a C7)'); }
+function appCenterMidiC4() { document.getElementById('midi-scroll-box').scrollLeft = 650; }
+function appConnectUsbMidi() {
+if (!navigator.requestMIDIAccess) { showToast('Use o toque nas teclas ou Chrome.'); return; }
+navigator.requestMIDIAccess().then(function(acc) {
+acc.inputs.forEach(function(inp) {
+inp.onmidimessage = function(e) {
+if ((e.data[0] & 0xf0) === 0x90 && e.data[2] > 0) {
+playNoteSound(e.data[1]);
+document.getElementById('midi-chord').textContent = NOTES_SHARP[e.data[1] % 12];
+}
+};
+});
+showToast('USB MIDI Ativo!');
+});
+}
+
+/* PLAYER E GRAVACAO */
+function appLoadAudioFile(e) {
+var f = e.target.files[0];
+if (!f) return;
+document.getElementById('player-title').textContent = f.name;
+document.getElementById('audio-element').src = URL.createObjectURL(f);
+}
+function appSkipAudio(s) {
+var a = document.getElementById('audio-element');
+if (a.src) a.currentTime += s;
+}
+var recObj = null, recChunks = [];
+function appStartRec() {
+if (!navigator.mediaDevices) { showToast('Sem suporte a microfone.'); return; }
+navigator.mediaDevices.getUserMedia({ audio: true }).then(function(st) {
+recChunks = [];
+recObj = new MediaRecorder(st);
+recObj.ondataavailable = function(e) { recChunks.push(e.data); };
+recObj.onstop = function() {
+var u = URL.createObjectURL(new Blob(recChunks, { type: 'audio/webm' }));
+document.getElementById('rec-links').innerHTML = '<a href="' + u + '" download="ensaio.webm" style="color:var(--orange)">⬇ Baixar Gravação</a>';
+document.getElementById('rec-status').textContent = 'Finalizado!';
+};
+recObj.start();
+document.getElementById('rec-status').textContent = '🔴 Gravando...';
+});
+}
+function appStopRec() { if (recObj) recObj.stop(); }
+
+function appSaveSettings() {
+state.settings.pedalMode = document.getElementById('setting-pedal-mode').value;
+state.settings.theme = document.getElementById('setting-theme').value;
+state.settings.chordColor = document.getElementById('setting-chord-color').value;
+saveAll();
+showToast('Ajustes salvos!');
+}
+function appExportBackup() {
+var u = URL.createObjectURL(new Blob([JSON.stringify(state)], { type: 'application/json' }));
+var a = document.createElement('a'); a.href = u; a.download = 'stagecifra_backup.json'; a.click();
+}
+function appResetDemo() { state.songs = DEMO_SONGS.slice(); saveAll(); appRenderHome(); showToast('Exemplos restaurados!'); }
+
+document.addEventListener('keydown', function(e) {
+var d = document.getElementById('pedal-diag');
+if (d) d.textContent = 'Tecla do Pedal: ' + e.key + ' (' + e.code + ')';
+if (!document.getElementById('view-stage').classList.contains('active')) return;
+if (['PageDown','ArrowDown','ArrowRight',' ','Enter'].indexOf(e.key) !== -1) { e.preventDefault(); appStepPage(1); }
+if (['PageUp','ArrowUp','ArrowLeft','Backspace'].indexOf(e.key) !== -1) { e.preventDefault(); appStepPage(-1); }
+});
+
+// Inicializa imediatamente
+appRenderHome();
+var sb = document.getElementById('status-badge');
+if (sb) { sb.textContent = '✅ Pronto v3.8'; sb.style.color = '#8bd49a'; }
+</script>
+</body>
+</html>
